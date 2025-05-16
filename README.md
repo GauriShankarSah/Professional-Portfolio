@@ -36,8 +36,8 @@ I'm passionate about cybersecurity and have been working in the field since the 
 
 - **Email**: gshankarjnk@gmail.com  
 - **LinkedIn**: https://www.facebook.com/gaurishankar.shah.507/  
-- **Website**: [your-portfolio-site.com](#)  
-- **GitHub**: [github.com/yourusername](#)
+- **Website**: https://gaurishankarsah.github.io/Professional-Portfolio/
+- **GitHub**: https://github.com/GauriShankarSah
 
 ---
 
