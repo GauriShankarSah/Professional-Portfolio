@@ -699,7 +699,7 @@ footer .copyright {
     grid-template-columns: repeat(1, 1fr);
   }
   section.blog {
-    clip-path: polygon(0 0, 100% 0, 100% 100%, 67% 97%, 0 100%);
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 100% 100%, 0 100%);
   }
 }
 
