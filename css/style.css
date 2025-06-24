@@ -255,7 +255,7 @@ section.about h3 {
 section.about p {
   font-family: "Lato", sans-serif;
   color: var(--ternary);
-  line-height: 1.8;
+  line-height: 1.6;
   margin-bottom: 2rem;
   text-align: justify;
 }
