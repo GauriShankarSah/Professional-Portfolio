@@ -15,13 +15,14 @@
             width: 100%;
             height: 600px;
             border: 1px solid #ccc;
-            margin-bottom: 40px;
+            margin-top: 20px;
         }
         .pdf-links a {
             display: block;
             margin-bottom: 10px;
             color: #0066cc;
             text-decoration: none;
+            cursor: pointer;
         }
         .pdf-links a:hover {
             text-decoration: underline;
@@ -33,17 +34,32 @@
     <h1>CrowdStrike Deployment & Management PDFs</h1>
 
     <div class="pdf-links">
-        <h2>Download Links</h2>
-        <a href="C:\Users\gshan\OneDrive\Desktop\Folder\CrowdStrike_Initial_for_Linux.pdf" download>⬇️ Installation Guide (PDF)</a>
-        <a href="pdfs/crowdstrike_uninstall_guide.pdf" download>⬇️ Uninstall Guide (PDF)</a>
-        <a href="pdfs/crowdstrike_silent_install_sccm.pdf" download>⬇️ SCCM Silent Install Guide (PDF)</a>
+        <h2>Download & Preview Links</h2>
+        <a href="./CrowdStrike_Initial_for_Linux.pdf" data-preview="./CrowdStrike_Initial_for_Linux.pdf">📄 Guide for Linux</a>
+        <a href="./CrowdStrike_Initial_for_Windows.pdf" data-preview="./CrowdStrike_Initial_for_Windows.pdf">📄 Guide for Windows</a>
+        <a href="./Falcon Logscale Connector requirements.pdf" data-preview="./Falcon Logscale Connector requirements.pdf">📄 prerequisites</a>
     </div>
 
     <hr>
 
     <h2>Embedded Preview</h2>
-    <p>Preview of Installation Guide:</p>
-    <iframe src="pdfs/crowdstrike_installation_guide.pdf"></iframe>
+    <p id="preview-label">Click a guide above to preview it below:</p>
+    <iframe id="pdf-preview" src="" title="PDF Preview"></iframe>
+
+    <script>
+        const links = document.querySelectorAll('.pdf-links a');
+        const iframe = document.getElementById('pdf-preview');
+        const label = document.getElementById('preview-label');
+
+        links.forEach(link => {
+            link.addEventListener('click', (event) => {
+                event.preventDefault(); // prevent navigation
+                const pdfSrc = link.getAttribute('data-preview');
+                iframe.src = pdfSrc;
+                label.textContent = `Previewing: ${link.textContent}`;
+            });
+        });
+    </script>
 
 </body>
 </html>
