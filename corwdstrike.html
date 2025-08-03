@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>CrowdStrike Deployment Resources</title>
+    <title>FleetManagement Deployment Resources</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -17,46 +17,80 @@
             border: 1px solid #ccc;
             margin-top: 20px;
         }
-        .pdf-links a {
+        pre {
+            background-color: #f4f4f4;
+            border: 1px solid #ccc;
+            padding: 15px;
+            overflow: auto;
+            max-height: 600px;
+        }
+        .file-links a {
             display: block;
             margin-bottom: 10px;
             color: #0066cc;
             text-decoration: none;
             cursor: pointer;
         }
-        .pdf-links a:hover {
+        .file-links a:hover {
             text-decoration: underline;
         }
     </style>
 </head>
 <body>
 
-    <h1>CrowdStrike Deployment & Management PDFs</h1>
+    <h1>FleetManagement Deployment Resources</h1>
 
-    <div class="pdf-links">
-        <h2>Download & Preview Links</h2>
-        <a href="./CrowdStrike_Initial_for_Linux.pdf" data-preview="./CrowdStrike_Initial_for_Linux.pdf">📄 Guide for Linux</a>
-        <a href="./CrowdStrike_Initial_for_Windows.pdf" data-preview="./CrowdStrike_Initial_for_Windows.pdf">📄 Guide for Windows</a>
-        <a href="./Falcon Logscale Connector requirements.pdf" data-preview="./Falcon Logscale Connector requirements.pdf">📄 prerequisites</a>
+    <div class="file-links">
+        <h2>PDF & YAML Files in FleetManagement Directory</h2>
+        <a href="#" data-type="pdf" data-src="CrowdStrike_Initial_for_Linux.pdf">📄 Linux Deployment Guide</a>
+        <a href="#" data-type="pdf" data-src="CrowdStrike_Initial_for_Windows.pdf">📄 Windows Deployment Guide</a>
+        <a href="#" data-type="pdf" data-src="Falcon Logscale Connector requirements.pdf">📄 Logscale Prerequisites</a>
+        <a href="#" data-type="yaml" data-src="FleetManagement/config.yaml">📘 Fleet_Management_config.yaml</a>
     </div>
 
     <hr>
 
-    <h2>Embedded Preview</h2>
-    <p id="preview-label">Click a guide above to preview it below:</p>
-    <iframe id="pdf-preview" src="" title="PDF Preview"></iframe>
+    <h2 id="preview-label">Click a file above to preview it:</h2>
+    <iframe id="pdf-preview" src="" style="display:none;"></iframe>
+    <pre id="yaml-preview" style="display:none;"></pre>
 
     <script>
-        const links = document.querySelectorAll('.pdf-links a');
+        const links = document.querySelectorAll('.file-links a');
         const iframe = document.getElementById('pdf-preview');
+        const yamlBox = document.getElementById('yaml-preview');
         const label = document.getElementById('preview-label');
 
         links.forEach(link => {
             link.addEventListener('click', (event) => {
-                event.preventDefault(); // prevent navigation
-                const pdfSrc = link.getAttribute('data-preview');
-                iframe.src = pdfSrc;
-                label.textContent = `Previewing: ${link.textContent}`;
+                event.preventDefault();
+
+                const fileType = link.getAttribute('data-type');
+                const fileSrc = link.getAttribute('data-src');
+                const fileName = link.textContent.trim();
+
+                label.textContent = `Previewing: ${fileName}`;
+                
+                if (fileType === 'pdf') {
+                    iframe.src = fileSrc;
+                    iframe.style.display = 'block';
+                    yamlBox.style.display = 'none';
+                } else if (fileType === 'yaml') {
+                    fetch(fileSrc)
+                        .then(response => {
+                            if (!response.ok) throw new Error('File not found.');
+                            return response.text();
+                        })
+                        .then(text => {
+                            yamlBox.textContent = text;
+                            iframe.style.display = 'none';
+                            yamlBox.style.display = 'block';
+                        })
+                        .catch(err => {
+                            yamlBox.textContent = `Error loading file: ${err.message}`;
+                            iframe.style.display = 'none';
+                            yamlBox.style.display = 'block';
+                        });
+                }
             });
         });
     </script>
