@@ -1,0 +1,166 @@
+# Define the sink (destination) for the logs
+sinks:
+  example_sink:
+    type: logscale
+    url: "https://cloud.humio.com/"  # Replace with your LogScale instance URL
+    token: "${INGEST_TOKEN}"  # Use environment variable for the ingest token
+
+    # Optional: Override the maximum batch size (in bytes)
+    # maxBatchSize: 8388608  # 8 MB
+    # Default is 16 MB. It should not be increased, but may be lowered if needed.
+
+    # Optional: Override the maximum event size (in bytes)
+    # maxEventSize: 1048576  # 1 MB
+    # Default is 1 MB, which is the default maximum that LogScale supports.
+
+    # Optional: Specify compression method
+    # compression: "gzip"  # Options: "auto", "none", "gzip", "deflate"
+    # Default is "auto", which attempts "gzip" but falls back to "none" if unsupported.
+
+    # Optional: Specify compression level (0-9, where 0 is no compression and 9 is best compression)
+    # compressionLevel: 1
+
+    # Optional: Specify a proxy
+    # proxy: "http://proxy.example.com:8080"
+    # Default is "auto", which uses the system proxy if possible, or falls back to "none".
+    # You can also use "system" to force system proxy use, or "none" to disable proxy use.
+
+    # Optional: Configure TLS options
+    # tls:
+    #   insecure: false  # Set to true to disable certificate validation (not recommended)
+    #   # Note: caCert and caFile are mutually exclusive. Use only one of them.
+    #   caCert: "-----BEGIN CERTIFICATE-----\n...\n-----END CERTIFICATE-----"
+    #   # caCert is for providing an inline PEM encoded CA certificate
+    #   # caFile: "/path/to/ca/cert.pem"
+    #   # caFile is for providing a path to a file containing a PEM encoded CA certificate
+
+    # Optional: Number of worker threads for sending data
+    # workers: 4
+
+    # Configure the queue for buffering events
+    queue:
+      # Memory queue configuration
+      type: memory
+      maxLimitInMB: 1024  # Maximum queue size in MB
+      # Note: The queue size can be lowered if needed, but it should not be necessary to increase it.
+      # Optional: Action to take when queue is full
+      # fullAction: "pause"  # Options: "pause" or "deleteOldest"
+      # Optional: Flush timeout in milliseconds
+      # flushTimeOutInMillisecond: 1000
+
+    # Alternate disk queue configuration (uncomment to use)
+    # queue:
+    #   type: disk
+    #   maxLimitInMB: 4096  # Maximum queue size in MB
+    #   # Note: Changing the disk queue size requires a rewrite of the queue storage file.
+    #   # Optional: Action to take when queue is full
+    #   # fullAction: "pause"  # Options: "pause" or "deleteOldest"
+    #   # Optional: Storage directory
+    #   # storageDir: "/path/to/queue/storage"
+    #   # Default storage directory is under the dataDirectory of the program.
+  my_examplesink1:
+    type: logscale
+    url: "https://cloud.humio.com/"  # Replace with your LogScale instance URL
+    token: "${INGEST_TOKEN}"  # Use environment variable for the ingest token
+  flc_windows_eventlog:
+    type: humio
+    token: XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
+    ## Replace with the "Ingest URL" on the FLC download page. It must include the "https://" at the beginning.   
+    url: https://XXX.YYY.ZZZ
+    ## Keep this option as "none" unless you actually need a proxy.
+    proxy: none
+    ## The TLS option can be uncommented if you're using a self-signed certificate.
+    ## This generally isn't needed unless it's a self-hosted instance. 
+    #tls:
+      #insecure: true     
+    ## This sets the maximum single event size to 8 MB. You can change as needed.
+    #maxEventSize: 8388608
+    ## Uncomment if you would like to force a specific level of gzip compression. 9 is the highest.
+    #maxBatchSize: 16777216
+    #compression: gzip
+    #compressionLevel: 9
+    ## Uncomment if you want to use disk for event queue storage instead of memory.
+    ## Please note this will be much slower than a memory queue.
+    #queue:
+      #type: disk
+      #fullAction: pause
+      #maxLimitInMB: 4096
+    ## Add more workers to processing. The default is 4 workers. 
+    ## This can be increased if FLC is falling behind on processing.
+    #workers: 8
+  flc_windows_fileread:
+    type: humio
+    token: XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
+    ## Replace with the "Ingest URL" on the FLC download page. It must include the "https://" at the beginning.   
+    url: https://XXX.YYY.ZZZ
+    proxy: none
+  flc_windows_syslog1:
+    type: humio
+    token: XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
+    ## Replace with the "Ingest URL" on the FLC download page. It must include the "https://" at the beginning.   
+    url: https://XXX.YYY.ZZZ
+    proxy: none
+  flc_windows_syslog2:
+    type: humio
+    token: XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
+    ## Replace with the "Ingest URL" on the FLC download page. It must include the "https://" at the beginning.   
+    url: https://XXX.YYY.ZZZ
+    proxy: none
+
+# Define the sources for data collection
+sources:
+  # Add your sources here. Examples include:
+  # - file
+  # - syslog
+  # - wineventlog
+  # - journald
+  # - cmd
+  # - unifiedlog
+
+  windows_events:
+    type: wineventlog
+    ## Add other channels by simple adding additional "name" lines.
+    ## The following command can be used to find other channels:
+    ## Get-WinEvent -ListLog * -EA silentlycontinue | sort-object -Property Recordcount -desc
+    channels:
+      - name: Application
+      - name: Security
+      - name: System
+    #  - name: Windows PowerShell
+    #  - name: ForwardedEvents
+    #  - name: Microsoft-Windows-Sysmon/Operational
+    ## You can manually specify a parser to be used here.
+    ## This overrides the parser specified in the LogScale UI.
+    #parser: SampleWindowsParser
+    sink: flc_windows_eventlog
+
+  file_read:
+    type: file
+    include:
+    - c:\temp\flc_files\csv_sample2.csv
+    exclude: 
+    - c:\temp\flc_files\ignore.txt
+    sink: flc_windows_fileread
+    ## You can manually specify a parser to be used here.
+    ## This overrides the parser specified in the LogScale UI.
+    #parser: SampleFileParser
+
+  syslog1:
+    type: syslog
+    mode: udp
+    port: 514
+    ## This sets the maximum receivable single event size to 2048 bytes (the default; larger events will be truncated)
+    maxEventSize: 2048
+    ## If “receiveBufferSize” var is not manually set, it is automatcially set to 64 times maxEventSize
+    #receiveBufferSize: 131072
+    sink: flc_windows_syslog1
+
+  syslog2:
+    type: syslog
+    mode: tcp
+    port: 514
+    ## This sets the maximum receivable single event size to ~1M (the max size allowed)
+    maxEventSize: 1048576
+    ## If “receiveBufferSize” var is set, it must be set higher than the maxEventSize (or FLC will not start)
+    receiveBufferSize: 1048577
+    sink: flc_windows_syslog2
